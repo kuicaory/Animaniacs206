@@ -55,4 +55,5 @@ print("✅ Done: 10 quotes saved to 'anime_quotes.db'")
 API_Key = "qPRNpqUB1A7axpBHafC5J1XR"
 url = f"https://danbooru.donmai.us/profile.json?api_key={API_Key}"
 
-test ="Test"
+second_url = 'https://api.myanimelist.net/v2'
+
