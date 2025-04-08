@@ -51,3 +51,6 @@ while len(quote_set) < 10:
 conn.commit()
 conn.close()
 print("✅ Done: 10 quotes saved to 'anime_quotes.db'")
+
+API_Key = "qPRNpqUB1A7axpBHafC5J1XR"
+url = f"https://danbooru.donmai.us/profile.json?api_key={API_Key}"
