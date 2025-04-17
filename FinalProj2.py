@@ -94,3 +94,19 @@ for post in posts:
 
 conn.commit()
 conn.close()
+
+##################################################################################
+
+import csv
+
+conn = sqlite3.connect("danbooru_posts.db")
+cursor = conn.cursor()
+
+cursor.execute('''
+    SELECT tag, COUNT(*) as count
+    FROM tags
+    GROUP BY tag
+    ORDER BY count DESC
+    LIMIT 10
+''')
+top_tags = cursor.fetchall()
