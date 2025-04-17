@@ -110,3 +110,12 @@ cursor.execute('''
     LIMIT 10
 ''')
 top_tags = cursor.fetchall()
+
+
+cursor.execute('''
+    SELECT rating, AVG(score)
+    FROM posts
+    GROUP BY rating
+''')
+avg_scores = cursor.fetchall()
+
