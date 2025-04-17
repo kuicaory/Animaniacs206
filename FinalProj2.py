@@ -124,3 +124,12 @@ with open("top_tags.csv", "w", newline='', encoding="utf-8") as f:
     writer = csv.writer(f)
     writer.writerow(["Tag", "Count"])
     writer.writerows(top_tags)
+
+
+with open("avg_scores_by_rating.csv", "w", newline='', encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Rating", "Average Score"])
+    writer.writerows(avg_scores)
+
+conn.close()
+print("Files saved!")
