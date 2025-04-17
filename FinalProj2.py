@@ -119,3 +119,8 @@ cursor.execute('''
 ''')
 avg_scores = cursor.fetchall()
 
+
+with open("top_tags.csv", "w", newline='', encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Tag", "Count"])
+    writer.writerows(top_tags)
