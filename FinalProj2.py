@@ -57,11 +57,11 @@ conn.commit()
 
 
 page = 1
-#page2 = 2
+page2 = 2
 #page3 = 3
 #page4 = 4
 url = f"https://danbooru.donmai.us/posts.json?limit=25&page={page}"
-#url2 = f"https://danbooru.donmai.us/posts.json?limit=25&page={page2}"
+url2 = f"https://danbooru.donmai.us/posts.json?limit=25&page={page2}"
 #url3 = f"https://danbooru.donmai.us/posts.json?limit=25&page={page3}"
 #url4 = f"https://danbooru.donmai.us/posts.json?limit=25&page={page4}"
 response = requests.get(url)
