@@ -5,7 +5,7 @@ import time
 API_Key = "qPRNpqUB1A7axpBHafC5J1XR"
 username = "esmecard"
 url = f"https://danbooru.donmai.us/profile.json?api_key={API_Key}/artists/banned"
-url = "https://danbooru.donmai.us/posts.json?limit=25&page=1"
+url = "https://danbooru.donmai.us/posts.json?limit=25&page=2"
 
 response = requests.get(url)
 
