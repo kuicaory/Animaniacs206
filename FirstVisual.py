@@ -37,7 +37,15 @@ def plot_half_decade_distribution(grouped_data):
     plt.grid(axis='y', linestyle='--', alpha=0.7)
     plt.show()
 
+def write_data_to_file(grouped_data, filename="half_decade_counts.txt"):
+    with open(filename, 'w') as f:
+        for range_label, count in grouped_data.items():
+            f.write(f"{range_label}: {count} animes\n")
+    print(f"Data written to {filename}")
+
 
 db_path = "anime_quotes.db"
 grouped = group_animes_by_half_decade(db_path)
+write_data_to_file(grouped)
 plot_half_decade_distribution(grouped)
+
