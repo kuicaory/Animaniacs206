@@ -2,7 +2,7 @@ import requests
 import sqlite3
 
 def top_animes():
-    conn3 = sqlite3.connect('anime-list.db')
+    conn3 = sqlite3.connect('anime_quotes.db')
     cur = conn3.cursor()
     cur.execute("""
         CREATE TABLE IF NOT EXISTS animes (
@@ -17,15 +17,16 @@ def top_animes():
     conn3.commit()
 
     anime_set = set()
-    page = 1
+    page = 6
 
-    while len(anime_set) < 25:
+    while len(anime_set) < 1:
         third_url = f'https://api.jikan.moe/v4/top/anime?page={page}'
         try:
             resp = requests.get(third_url)
             if resp.status_code == 200:
                 data3 = resp.json()
                 for anime in data3['data']:
+                    print(anime['genres'][2])
                     if anime['mal_id'] not in anime_set and len(anime_set) < 25:
                         cur.execute("SELECT 1 FROM animes WHERE anime_id = ?", (anime['mal_id'],))
                         if cur.fetchone():

@@ -68,7 +68,7 @@ response = requests.get(url)
 #response = requests.get(url2)
 #response = requests.get(url3)
 #response = requests.get(url4)
-posts = response.json()
+
 
 
 for post in posts:
