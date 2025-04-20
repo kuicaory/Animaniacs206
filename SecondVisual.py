@@ -34,7 +34,7 @@ def plot_quote_counts(data):
     plt.grid(axis='x', linestyle='--', alpha=0.7)
     plt.show()
 
-# Usage
-db_path = "anime_quotes.db"  # Replace with your actual DB path
+
+db_path = "anime_quotes.db"
 quote_data = get_quote_counts(db_path)
 plot_quote_counts(quote_data)
