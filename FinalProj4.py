@@ -16,3 +16,15 @@ cursor.execute('''
         type TEXT
     )
 ''')
+
+# Create genres table (many-to-one)
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS genres (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        anime_id INTEGER,
+        genre TEXT,
+        FOREIGN KEY(anime_id) REFERENCES anime(id)
+    )
+''')
+
+conn.commit()
