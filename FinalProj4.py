@@ -28,3 +28,11 @@ cursor.execute('''
 ''')
 
 conn.commit()
+
+# Function to get anime from API
+def fetch_anime_batch(page_num):
+    url = f"https://api.jikan.moe/v4/anime?page={page_num}&limit=25"
+    response = requests.get(url)
+    response.raise_for_status()
+    return response.json().get("data", [])
+
