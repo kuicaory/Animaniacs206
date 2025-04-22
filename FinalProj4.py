@@ -69,3 +69,29 @@ conn.commit()
 conn.close()
 print("Batch saved to jikan_anime.db")
 
+############################################################################################
+
+import sqlite3
+import csv
+
+conn = sqlite3.connect("jikan_anime.db")
+cursor = conn.cursor()
+
+# Top 10 genres
+cursor.execute('''
+    SELECT genre, COUNT(*) as count
+    FROM genres
+    GROUP BY genre
+    ORDER BY count DESC
+    LIMIT 10
+''')
+top_genres = cursor.fetchall()
+
+# Average score by type
+cursor.execute('''
+    SELECT type, AVG(score)
+    FROM anime
+    WHERE score IS NOT NULL
+    GROUP BY type
+''')
+avg_scores = cursor.fetchall()
