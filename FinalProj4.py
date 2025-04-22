@@ -50,4 +50,22 @@ for anime in anime_batch:
     # PRINT TO TERMINAL
     print(f"{title} | Episodes: {episodes} | Score: {score} | Type: {type_}")
 
- 
+    # Insert into anime table
+    cursor.execute('''
+        INSERT OR IGNORE INTO anime (id, title, episodes, score, type)
+        VALUES (?, ?, ?, ?, ?)
+    ''', (anime_id, title, episodes, score, type_))
+
+    # Insert genres with print
+    for genre in anime.get("genres", []):
+        genre_name = genre.get("name")
+        print(f"   ↳ Genre: {genre_name}")
+        cursor.execute('''
+            INSERT INTO genres (anime_id, genre)
+            VALUES (?, ?)
+        ''', (anime_id, genre_name))
+
+conn.commit()
+conn.close()
+print("Batch saved to jikan_anime.db")
+
