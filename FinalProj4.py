@@ -1,75 +1,70 @@
-import requests
 import sqlite3
-import time
+import requests
 
-# This connects to or creates the local SQLite file named 'jikan_anime.db'
-conn = sqlite3.connect("jikan_anime.db")
+# Connect to or create the SQLite database
+conn = sqlite3.connect("tracemoe_anime.db")
 cursor = conn.cursor()
 
-# this table stores general anime info from the jikan API
+# Create table for anime scenes
 cursor.execute('''
-    CREATE TABLE IF NOT EXISTS anime (
-        id INTEGER PRIMARY KEY,
-        title TEXT,
-        episodes INTEGER,
-        score REAL,
-        type TEXT
+    CREATE TABLE IF NOT EXISTS scenes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        anime_title TEXT,
+        episode INTEGER,
+        similarity REAL,
+        timestamp TEXT
     )
 ''')
 
-# this table is storing genres for each anime in the url, linked by anime_id
+# Create table for genres
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS genres (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        anime_id INTEGER,
+        scene_id INTEGER,
         genre TEXT,
-        FOREIGN KEY(anime_id) REFERENCES anime(id)
+        FOREIGN KEY(scene_id) REFERENCES scenes(id)
     )
 ''')
 
 conn.commit()
 
-# I defined the function to to get anime from API
-def fetch_anime_batch(page_num):
-    url = f"https://api.jikan.moe/v4/anime?page={page_num}&limit=25"
-    response = requests.get(url)
-    response.raise_for_status()
-    return response.json().get("data", [])
+# Fetch recent anime scenes from the Trace.moe API
+url = "https://api.trace.moe/search?anilistInfo"
+response = requests.get(url)
+response.raise_for_status()
+data = response.json()
 
-# This function fetches 25 anime from the Jikan API using the given page number ( only doing 1 though)
-page = 1 
-anime_batch = fetch_anime_batch(page)
+# Limit to 25 results
+scenes = data["result"][:25]
 
-for anime in anime_batch:
-    anime_id = anime.get("mal_id")
-    title = anime.get("title")
-    episodes = anime.get("episodes")
-    score = anime.get("score")
-    type_ = anime.get("type")
+# Store each scene
+for scene in scenes:
+    title = scene["anilist"]["title"]["romaji"]
+    episode = scene.get("episode")
+    similarity = scene.get("similarity")
+    timestamp = scene.get("from")  # seconds into the episode
 
-    # printed information to the terminal to verify to work
-    print(f"{title} | Episodes: {episodes} | Score: {score} | Type: {type_}")
+    print(f"🎬 {title} | Ep: {episode} | Confidence: {similarity:.2f} | Time: {timestamp}s")
 
-    # inserted anime into the 'anime' table
+    # Insert into scenes table
     cursor.execute('''
-        INSERT OR IGNORE INTO anime (id, title, episodes, score, type)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (anime_id, title, episodes, score, type_))
+        INSERT INTO scenes (anime_title, episode, similarity, timestamp)
+        VALUES (?, ?, ?, ?)
+    ''', (title, episode, similarity, timestamp))
 
-    # inserted each genre into the 'genres' table
-    for genre in anime.get("genres", []):
-        genre_name = genre.get("name")
-        print(f"   ↳ Genre: {genre_name}")
+    scene_id = cursor.lastrowid  # Get ID for linking genres
+
+    # Save genres
+    for genre in scene["anilist"].get("genres", []):
+        print(f"   ↳ Genre: {genre}")
         cursor.execute('''
-            INSERT INTO genres (anime_id, genre)
+            INSERT INTO genres (scene_id, genre)
             VALUES (?, ?)
-        ''', (anime_id, genre_name))
-#save all insertions to the databases
+        ''', (scene_id, genre))
+
 conn.commit()
-#closes the database connections
 conn.close()
-#this confirms whether the batch was saved
-print("Batch saved to jikan_anime.db")
+print("Scene batch saved to tracemoe_anime.db")
 
 ############################################################################################
 
