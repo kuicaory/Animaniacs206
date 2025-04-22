@@ -1,0 +1,24 @@
+Anime ID	Anime Title	Quote Count
+2	Death Note	5
+6	Sword Art Online	1
+9	Naruto	4
+10	Tokyo Ghoul	2
+17	One Piece	3
+30	Akame ga Kill!	1
+35	Bleach	7
+40	Sword Art Online II	2
+49	Death Parade	1
+54	Fairy Tail	3
+57	Black Clover	1
+64	Soul Eater	4
+81	Fate/Zero	1
+84	Fullmetal Alchemist	3
+95	Bakemonogatari	1
+97	Hyouka	1
+114	Dragon Ball Z	1
+118	Guilty Crown	1
+145	Gintama	1
+150	Dragon Ball	1
+183	Fate/stay night	1
+227	Kokoro Connect	1
+247	InuYasha	5

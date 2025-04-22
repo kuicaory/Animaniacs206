@@ -17,7 +17,7 @@ def top_animes():
     conn3.commit()
 
     anime_set = set()
-    page = 6
+    page = 1
 
     while len(anime_set) < 1:
         third_url = f'https://api.jikan.moe/v4/top/anime?page={page}'
@@ -26,7 +26,6 @@ def top_animes():
             if resp.status_code == 200:
                 data3 = resp.json()
                 for anime in data3['data']:
-                    print(anime['genres'][2])
                     if anime['mal_id'] not in anime_set and len(anime_set) < 25:
                         cur.execute("SELECT 1 FROM animes WHERE anime_id = ?", (anime['mal_id'],))
                         if cur.fetchone():

@@ -34,7 +34,19 @@ def plot_quote_counts(data):
     plt.grid(axis='x', linestyle='--', alpha=0.7)
     plt.show()
 
+def write_quote_counts_to_txt(data, filename="quote_counts_by_rank.txt"):
+    # Sort by descending rank (i.e., rank 1000 -> 1 becomes ascending numerically)
+    sorted_data = sorted(data, key=lambda x: x[2], reverse=False)
+
+    with open(filename, "w", encoding="utf-8") as f:
+        for anime, count, rank in sorted_data:
+            f.write(f"{anime} (Rank #{rank}): {count} quotes\n")
+
+    print(f"Data written to {filename}")
+
 
 db_path = "anime_quotes.db"
 quote_data = get_quote_counts(db_path)
+write_quote_counts_to_txt(quote_data)
 plot_quote_counts(quote_data)
+

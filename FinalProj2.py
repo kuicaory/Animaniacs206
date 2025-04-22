@@ -1,135 +1,79 @@
 import requests
+from bs4 import BeautifulSoup
 import sqlite3
-import time
 
-API_Key = "qPRNpqUB1A7axpBHafC5J1XR"
-username = "esmecard"
-url = f"https://danbooru.donmai.us/profile.json?api_key={API_Key}/artists/banned"
-url = "https://danbooru.donmai.us/posts.json?limit=25&page=4"
+DB_NAME = "anime_quotes.db"
 
-response = requests.get(url)
+def create_table():
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS anime_titles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT UNIQUE,
+            score REAL
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-print("Status Code:", response.status_code)
+def insert_title(title, score):
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    try:
+        c.execute("INSERT OR IGNORE INTO anime_titles (title, score) VALUES (?, ?)", (title, score))
+        conn.commit()
+    finally:
+        conn.close()
 
-if response.status_code == 200:
-    posts = response.json()
-    for post in posts:
-        print({
-            'id': post['id'],
-            'created_at': post.get('created_at'),
-            'score': post.get('score'),
-            'rating': post.get('rating'),
-            'file_url': post.get('file_url'),
-            'tags': post.get('tag_string')
-        })
-else:
-    print("Failed to fetch posts.")
-    
-print(response.status_code)
+def scrape_page(page_num=1, half=1):
+    """
+    page_num: 1 = 0 offset, 2 = 50 offset, etc.
+    half: 1 = top 25, 2 = bottom 25
+    """
+    offset = (page_num - 1) * 50
+    url = f"https://myanimelist.net/topanime.php?type=bypopularity&limit={offset}"
 
-print(response.json())
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
 
-#####################################################################
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        print(f"Failed to load page {page_num}. Status code: {response.status_code}")
+        return
 
-conn = sqlite3.connect("danbooru_posts.db")
-cursor = conn.cursor()
+    soup = BeautifulSoup(response.text, 'html.parser')
+    entries = soup.select("tr.ranking-list")
 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS posts (
-        id INTEGER PRIMARY KEY,
-        created_at TEXT,
-        score INTEGER,
-        rating TEXT,
-        file_url TEXT
-    )
-''')
+    # Only take 25 at a time
+    if half == 1:
+        entries = entries[:25]
+    else:
+        entries = entries[25:]
 
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS tags (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        post_id INTEGER,
-        tag TEXT,
-        FOREIGN KEY(post_id) REFERENCES posts(id)
-    )
-''')
+    print(f"Scraping page {page_num}, half {half} (entries {1 if half == 1 else 26}–{25 if half == 1 else 50})")
 
-conn.commit()
+    for entry in entries:
+        title_tag = entry.select_one("h3.anime_ranking_h3 a")
+        score_tag = entry.select_one("td.score span.score-label")
 
+        if title_tag and score_tag:
+            title = title_tag.text.strip()
+            score = score_tag.text.strip()
+            score_val = float(score) if score != "N/A" else None
 
-page = 1
-#page2 = 2
-#page3 = 3
-#page4 = 4
-url = f"https://danbooru.donmai.us/posts.json?limit=25&page={page}"
-#url2 = f"https://danbooru.donmai.us/posts.json?limit=25&page={page2}"
-#url3 = f"https://danbooru.donmai.us/posts.json?limit=25&page={page3}"
-#url4 = f"https://danbooru.donmai.us/posts.json?limit=25&page={page4}"
-response = requests.get(url)
-#response = requests.get(url2)
-#response = requests.get(url3)
-#response = requests.get(url4)
+            insert_title(title, score_val)
+            print(f"Added: {title} | Score: {score}")
 
+if __name__ == "__main__":
+    create_table()
 
-
-for post in posts:
-    post_id = post['id']
-    created = post.get('created_at')
-    score = post.get('score')
-    rating = post.get('rating')
-    file_url = post.get('file_url')
-    tag_string = post.get('tag_string', '')
-
-
-    cursor.execute('''
-        INSERT OR IGNORE INTO posts (id, created_at, score, rating, file_url)
-        VALUES (?, ?, ?, ?, ?)
-    ''', (post_id, created, score, rating, file_url))
-
-
-    for tag in tag_string.split():
-        cursor.execute('''
-            INSERT INTO tags (post_id, tag)
-            VALUES (?, ?)
-        ''', (post_id, tag))
-
-conn.commit()
-conn.close()
-
-##################################################################################
-
-import csv
-
-conn = sqlite3.connect("danbooru_posts.db")
-cursor = conn.cursor()
-
-cursor.execute('''
-    SELECT tag, COUNT(*) as count
-    FROM tags
-    GROUP BY tag
-    ORDER BY count DESC
-    LIMIT 10
-''')
-top_tags = cursor.fetchall()
-
-
-cursor.execute('''
-    SELECT rating, AVG(score)
-    FROM posts
-    GROUP BY rating
-''')
-avg_scores = cursor.fetchall()
-
-
-with open("top_tags.csv", "w", newline='', encoding="utf-8") as f:
-    writer = csv.writer(f)
-    writer.writerow(["Tag", "Count"])
-    writer.writerows(top_tags)
-
-
-with open("avg_scores_by_rating.csv", "w", newline='', encoding="utf-8") as f:
-    writer = csv.writer(f)
-    writer.writerow(["Rating", "Average Score"])
-    writer.writerows(avg_scores)
-
-conn.close()
-print("Files saved!")
+    try:
+        page = int(input("Enter the page number to scrape (1 = top 50, 2 = 51–100, etc.): "))
+        half = int(input("Enter 1 to scrape top 25 or 2 for bottom 25 of the page: "))
+        if half not in (1, 2):
+            raise ValueError
+        scrape_page(page, half)
+    except ValueError:
+        print("Invalid input. Page must be int, and half must be 1 or 2.")
