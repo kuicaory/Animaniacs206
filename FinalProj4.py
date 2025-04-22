@@ -36,3 +36,18 @@ def fetch_anime_batch(page_num):
     response.raise_for_status()
     return response.json().get("data", [])
 
+# Store 25 at a time
+page = 1 
+anime_batch = fetch_anime_batch(page)
+
+for anime in anime_batch:
+    anime_id = anime.get("mal_id")
+    title = anime.get("title")
+    episodes = anime.get("episodes")
+    score = anime.get("score")
+    type_ = anime.get("type")
+
+    # PRINT TO TERMINAL
+    print(f"{title} | Episodes: {episodes} | Score: {score} | Type: {type_}")
+
+ 
