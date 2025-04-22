@@ -95,3 +95,17 @@ cursor.execute('''
     GROUP BY type
 ''')
 avg_scores = cursor.fetchall()
+
+# Save both to CSV
+with open("jikan_top_genres.csv", "w", newline='', encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Genre", "Count"])
+    writer.writerows(top_genres)
+
+with open("jikan_avg_scores_by_type.csv", "w", newline='', encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Type", "Average Score"])
+    writer.writerows(avg_scores)
+
+conn.close()
+print("Analysis complete. CSV files saved.")
