@@ -99,3 +99,12 @@ cursor.execute('''
     LIMIT 10
 ''')
 top_genres = cursor.fetchall()
+
+# Average score by format (TV, Movie, etc.)
+cursor.execute('''
+    SELECT format, AVG(score)
+    FROM anime
+    WHERE score IS NOT NULL
+    GROUP BY format
+''')
+avg_scores = cursor.fetchall()
