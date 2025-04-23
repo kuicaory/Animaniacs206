@@ -30,3 +30,32 @@ cursor.execute('''
 ''')
 
 conn.commit()
+
+#Fetch from AniList GraphQL API
+
+url = "https://graphql.anilist.co"
+query = '''
+query ($page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    media(type: ANIME, sort: POPULARITY_DESC) {
+      id
+      title {
+        romaji
+      }
+      episodes
+      averageScore
+      format
+      genres
+    }
+  }
+}
+'''
+
+variables = {
+    "page": 1,
+    "perPage": 25
+}
+
+response = requests.post(url, json={"query": query, "variables": variables})
+response.raise_for_status()
+anime_batch = response.json()["data"]["Page"]["media"]
