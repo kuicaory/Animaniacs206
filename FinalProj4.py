@@ -59,3 +59,17 @@ variables = {
 response = requests.post(url, json={"query": query, "variables": variables})
 response.raise_for_status()
 anime_batch = response.json()["data"]["Page"]["media"]
+
+
+# Insert into database
+
+for anime in anime_batch:
+    anime_id = anime["id"]
+    title = anime["title"]["romaji"]
+    episodes = anime.get("episodes")
+    score = anime.get("averageScore")
+    format_ = anime.get("format")
+
+    print(f"{title} | Episodes: {episodes} | Score: {score} | Format: {format_}")
+
+ 
