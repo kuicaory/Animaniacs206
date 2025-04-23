@@ -26,4 +26,9 @@ def plot_anime_format_distribution(db_path='anilist_anime.db', output_file='form
     formats = [row[0] for row in data]
     counts = [row[1] for row in data]
 
-   
+    # Plot the pie chart
+    plt.figure(figsize=(8, 8))
+    plt.pie(counts, labels=formats, autopct='%1.1f%%', startangle=140, shadow=True)
+    plt.title("Distribution of Anime Formats (TV, Movie, OVA, etc.)")
+    plt.tight_layout()
+    plt.show()
