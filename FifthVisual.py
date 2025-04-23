@@ -22,4 +22,8 @@ def plot_anime_format_distribution(db_path='anilist_anime.db', output_file='form
         for format_, count in data:
             f.write(f"{format_}\t{count}\n")
 
+    # Prepare data for pie chart
+    formats = [row[0] for row in data]
+    counts = [row[1] for row in data]
+
    
