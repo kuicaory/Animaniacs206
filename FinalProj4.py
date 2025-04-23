@@ -87,3 +87,15 @@ for genre in anime.get("genres", []):
     ''', (anime_id, genre))
 
 conn.commit()
+
+# Analysis and CSV Export
+
+# Top 10 genres
+cursor.execute('''
+    SELECT genre, COUNT(*) as count
+    FROM genres
+    GROUP BY genre
+    ORDER BY count DESC
+    LIMIT 10
+''')
+top_genres = cursor.fetchall()
