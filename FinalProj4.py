@@ -114,3 +114,15 @@ with open("anilist_top_genres.csv", "w", newline='', encoding="utf-8") as f:
     writer = csv.writer(f)
     writer.writerow(["Genre", "Count"])
     writer.writerows(top_genres)
+
+# Export scores by format to CSV
+with open("anilist_avg_scores_by_format.csv", "w", newline='', encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Format", "Average Score"])
+    writer.writerows(avg_scores)
+
+# Done
+conn.close()
+print("Data saved and CSV files generated:")
+print(" - anilist_top_genres.csv")
+print(" - anilist_avg_scores_by_format.csv")
