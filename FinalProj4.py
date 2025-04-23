@@ -18,3 +18,15 @@ cursor.execute('''
         format TEXT
     )
 ''')
+
+# Create genres table
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS genres (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        anime_id INTEGER,
+        genre TEXT,
+        FOREIGN KEY(anime_id) REFERENCES anime(id)
+    )
+''')
+
+conn.commit()
