@@ -8,7 +8,7 @@ import csv
 conn = sqlite3.connect("anilist_anime.db")
 cursor = conn.cursor()
 
-# Create anime table
+# Create anime table and includes ID, title, episode count, score, and format
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS anime (
         id INTEGER PRIMARY KEY,
@@ -19,7 +19,7 @@ cursor.execute('''
     )
 ''')
 
-# Create genres table
+# Create genres table to store genres
 cursor.execute('''
     CREATE TABLE IF NOT EXISTS genres (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,7 +61,7 @@ response.raise_for_status()
 anime_batch = response.json()["data"]["Page"]["media"]
 
 
-# Insert into database
+# Insert into database. it loops through the anime data
 
 for anime in anime_batch:
     anime_id = anime["id"]
@@ -72,13 +72,13 @@ for anime in anime_batch:
 
     print(f"{title} | Episodes: {episodes} | Score: {score} | Format: {format_}")
 
-# Insert into anime table
+# Insert into anime table or it ignores it if alreadye exists
 cursor.execute('''
     INSERT OR IGNORE INTO anime (id, title, episodes, score, format)
     VALUES (?, ?, ?, ?, ?)
 ''', (anime_id, title, episodes, score, format_))
 
-# Insert genres
+# Insert each genre into the genres table linked to the anime
 for genre in anime.get("genres", []):
     print(f"   ↳ Genre: {genre}")
     cursor.execute('''
@@ -90,7 +90,7 @@ conn.commit()
 
 # Analysis and CSV Export
 
-# Top 10 genres
+# finds the top 10 most common genres across all anime
 cursor.execute('''
     SELECT genre, COUNT(*) as count
     FROM genres
@@ -109,19 +109,19 @@ cursor.execute('''
 ''')
 avg_scores = cursor.fetchall()
 
-# Export genres to CSV
+# Export genres to CSV file
 with open("anilist_top_genres.csv", "w", newline='', encoding="utf-8") as f:
     writer = csv.writer(f)
     writer.writerow(["Genre", "Count"])
     writer.writerows(top_genres)
 
-# Export scores by format to CSV
+# Export average scores by format to a CSV file
 with open("anilist_avg_scores_by_format.csv", "w", newline='', encoding="utf-8") as f:
     writer = csv.writer(f)
     writer.writerow(["Format", "Average Score"])
     writer.writerows(avg_scores)
 
-# Done
+# Done for final confirmation and cleanup
 conn.close()
 print("Data saved and CSV files generated:")
 print(" - anilist_top_genres.csv")
