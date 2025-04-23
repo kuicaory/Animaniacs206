@@ -32,3 +32,7 @@ def plot_anime_format_distribution(db_path='anilist_anime.db', output_file='form
     plt.title("Distribution of Anime Formats (TV, Movie, OVA, etc.)")
     plt.tight_layout()
     plt.show()
+
+# Run it
+plot_anime_format_distribution('anilist_anime.db')
+   
