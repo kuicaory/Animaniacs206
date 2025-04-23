@@ -72,4 +72,18 @@ for anime in anime_batch:
 
     print(f"{title} | Episodes: {episodes} | Score: {score} | Format: {format_}")
 
- 
+# Insert into anime table
+cursor.execute('''
+    INSERT OR IGNORE INTO anime (id, title, episodes, score, format)
+    VALUES (?, ?, ?, ?, ?)
+''', (anime_id, title, episodes, score, format_))
+
+# Insert genres
+for genre in anime.get("genres", []):
+    print(f"   ↳ Genre: {genre}")
+    cursor.execute('''
+        INSERT INTO genres (anime_id, genre)
+        VALUES (?, ?)
+    ''', (anime_id, genre))
+
+conn.commit()
