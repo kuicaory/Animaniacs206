@@ -108,3 +108,9 @@ cursor.execute('''
     GROUP BY format
 ''')
 avg_scores = cursor.fetchall()
+
+# Export genres to CSV
+with open("anilist_top_genres.csv", "w", newline='', encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["Genre", "Count"])
+    writer.writerows(top_genres)
