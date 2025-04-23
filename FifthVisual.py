@@ -6,4 +6,12 @@ def plot_anime_format_distribution(db_path='anilist_anime.db', output_file='form
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
-   
+     # Count number of anime for each format
+    cursor.execute('''
+        SELECT format, COUNT(*) as count
+        FROM anime
+        WHERE format IS NOT NULL
+        GROUP BY format
+    ''')
+    data = cursor.fetchall()
+    conn.close()
