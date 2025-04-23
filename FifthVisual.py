@@ -15,3 +15,11 @@ def plot_anime_format_distribution(db_path='anilist_anime.db', output_file='form
     ''')
     data = cursor.fetchall()
     conn.close()
+
+    # Write data to a text file
+    with open(output_file, 'w') as f:
+        f.write("Format\tCount\n")
+        for format_, count in data:
+            f.write(f"{format_}\t{count}\n")
+
+   
